@@ -54,6 +54,11 @@
       "collection": "*",
       "filter": "field",
       "configurable": false
+    },
+    "caption": {
+      "type": "string",
+      "configurable": false,
+      "required": false
     }
   }
 }

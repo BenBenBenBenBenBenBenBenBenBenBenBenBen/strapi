@@ -134,6 +134,7 @@ export function* submit() {
 
     const requestUrl = `/content-manager/explorer/${currentModelName}/${id}`;
 
+    console.log('hello');
     // Call our request helper (see 'utils/request')
     // Pass false and false as arguments so the request helper doesn't stringify
     // the body and doesn't watch for the server to restart

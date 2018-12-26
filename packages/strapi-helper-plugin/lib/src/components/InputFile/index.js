@@ -13,6 +13,7 @@ import cn from 'classnames';
 
 import ImgPreview from 'components/ImgPreview';
 import InputFileDetails from 'components/InputFileDetails';
+import InputTextArea from 'components/InputTextArea';
 
 import styles from './styles.scss';
 
@@ -114,6 +115,11 @@ class InputFile extends React.Component {
     return true;
   }
 
+  addCaptionToValue = (e) => {
+    console.log(this.props.value[this.state.position]);
+    this.props.value[this.state.position].caption = e.target.value;
+  }
+
   render() {
     const {
       multiple,
@@ -122,6 +128,8 @@ class InputFile extends React.Component {
       value,
     } = this.props;
 
+    const fileVal = value;
+    console.log(fileVal[this.state.position]);
     return (
       <div>
         <div className={cn("form-control", styles.inputFileControlForm, this.props.error && 'is-invalid')}>
@@ -146,7 +154,6 @@ class InputFile extends React.Component {
               type="file"
               ref={(input) => this.inputFile = input}
             />
-
             <div className={styles.buttonContainer}>
               <i className="fa fa-plus" />
               <FormattedMessage id="app.components.InputFile.newFile" />
@@ -161,6 +168,8 @@ class InputFile extends React.Component {
             onFileDelete={this.handleFileDelete}
           />
         )}
+        {/* value={fileVal[this.state.position].caption || ''} */}
+        <InputTextArea placeholder={"Add caption..."} value={null} name="caption" onChange={this.addCaptionToValue.bind(this)} />
       </div>
     );
   }
