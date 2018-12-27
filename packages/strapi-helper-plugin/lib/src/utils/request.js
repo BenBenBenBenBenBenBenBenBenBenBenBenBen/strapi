@@ -138,6 +138,19 @@ export default function request(url, options = {}, shouldWatchServerRestart = fa
   if (options && options.body && stringify) {
     options.body = JSON.stringify(options.body);
   }
+  console.log(url)
+  if (options.body) {
+    const data = Array.from(options.body.entries()).reduce((memo, pair) => ({
+      ...memo,
+      [pair[0]]: pair[1],
+    }), {});
+    options.body.append("caption", data.media.caption)
+    console.log(Array.from(options.body.entries()).reduce((memo, pair) => ({
+      ...memo,
+      [pair[0]]: pair[1],
+    }), {}));
+  }
+
 
   return fetch(url, options)
     .then(checkStatus)

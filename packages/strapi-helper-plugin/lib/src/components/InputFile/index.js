@@ -129,7 +129,6 @@ class InputFile extends React.Component {
     } = this.props;
 
     const fileVal = value;
-    console.log(fileVal[this.state.position]);
     return (
       <div>
         <div className={cn("form-control", styles.inputFileControlForm, this.props.error && 'is-invalid')}>

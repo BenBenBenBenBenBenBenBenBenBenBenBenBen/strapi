@@ -68,7 +68,9 @@ module.exports = {
         return _.isArray(value) ? value.map(obj => parser(obj)) : value;
       };
 
-      const files = values.files;
+      let files = values.files;
+
+   
 
       // Parse stringify JSON data.
       values = Object.keys(values.fields).reduce((acc, current) => {
@@ -77,17 +79,23 @@ module.exports = {
         return acc;
       }, {});
 
+      // TODO: This needs to be updated to work with multiple image caption pairs
+      Object.keys(files).map((fileKey) => {
+        files[fileKey]["caption"] = values.caption
+      })
+
       // Update JSON fields.
       const entry = await strapi.query(params.model, source).create({
         values
       });
+
 
       // Then, request plugin upload.
       if (strapi.plugins.upload && Object.keys(files).length > 0) {
         // Upload new files and attach them to this entity.
         await strapi.plugins.upload.services.upload.uploadToEntity({
           id: entry.id || entry._id,
-          model: params.model
+          model: params.model,
         }, files, source);
       }
 

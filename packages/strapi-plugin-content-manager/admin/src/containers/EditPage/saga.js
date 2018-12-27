@@ -121,9 +121,9 @@ export function* submit() {
     }, new FormData());
 
     // Helper to visualize FormData
-    // for(var pair of recordCleaned.entries()) {
-    //   console.log(pair[0]+ ', '+ pair[1]);
-    // }
+    for(var pair of recordCleaned.entries()) {
+      console.log(pair[0]+ ', '+ pair[1]);
+    }
 
     const id = isCreating ? '' : record.id || record._id;
     const params = { source };
@@ -134,7 +134,10 @@ export function* submit() {
 
     const requestUrl = `/content-manager/explorer/${currentModelName}/${id}`;
 
-    console.log('hello');
+    
+
+    console.log(params);
+    
     // Call our request helper (see 'utils/request')
     // Pass false and false as arguments so the request helper doesn't stringify
     // the body and doesn't watch for the server to restart

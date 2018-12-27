@@ -59,8 +59,8 @@ module.exports = {
   },
 
   create: async ctx => {
+    console.log('CREATING')
     const { source } = ctx.request.query;
-
     try {
       // Create an entry using `queries` system
       ctx.body = await strapi.plugins['content-manager'].services['contentmanager'].add(ctx.params, ctx.request.body, source);

@@ -2,15 +2,13 @@ const _ = require('lodash');
 
 module.exports = async (ctx, next) => {
   const { source } = ctx.request.query;
-
   if (source && _.get(strapi.plugins, [source, 'config', 'layout', ctx.params.model, 'actions', ctx.request.route.action])) {
     const [ controller, action ] = _.get(strapi.plugins, [source, 'config', 'layout', ctx.params.model, 'actions', ctx.request.route.action], []).split('.');
-
     if (controller && action) {
       // Redirect to specific controller.
+
       if (ctx.request.body.hasOwnProperty('fields') && ctx.request.body.hasOwnProperty('files')) {
         let {files, fields} = ctx.request.body;
-
         const parser = (value) => {
           try {
             value = JSON.parse(value);

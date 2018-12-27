@@ -38,11 +38,10 @@ module.exports = {
         const buffers = parts.map(
           part => (_.isBuffer(part) ? part : Buffer.from(part)),
         );
-
         const buffer = Buffer.concat(buffers);
-
         return {
           name: stream.name,
+          caption: stream.caption,
           sha256: niceHash(buffer),
           hash: uuid().replace(/-/g, ''),
           ext:
@@ -185,11 +184,13 @@ module.exports = {
     // Asynchronous upload.
     await Promise.all(
       Object.keys(files).map(async attribute => {
+        // console.log(files);
         // Bufferize files per attribute.
+        //  console.log(attribute)
         const buffers = await this.bufferize(files[attribute]);
         const enhancedFiles = buffers.map(file => {
           const details = model.attributes[attribute];
-
+          // console.log(details)
           // Add related information to be able to make
           // the relationships later.
           file[details.via] = [
