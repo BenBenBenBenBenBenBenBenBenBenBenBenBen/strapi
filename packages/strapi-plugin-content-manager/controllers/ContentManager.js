@@ -8,6 +8,7 @@ const _ = require('lodash');
 
 module.exports = {
   models: async ctx => {
+    debugger;
     const pluginsStore = strapi.store({
       environment: '',
       type: 'plugin',
@@ -59,9 +60,10 @@ module.exports = {
   },
 
   create: async ctx => {
-    console.log('CREATING')
+    debugger;
     const { source } = ctx.request.query;
     try {
+      console.log('ContentManager controller create: ', ctx.request.body)
       // Create an entry using `queries` system
       ctx.body = await strapi.plugins['content-manager'].services['contentmanager'].add(ctx.params, ctx.request.body, source);
     } catch(error) {

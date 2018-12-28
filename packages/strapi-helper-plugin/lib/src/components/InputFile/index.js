@@ -24,6 +24,7 @@ class InputFile extends React.Component {
     didDeleteFile: false,
     isUploading: false,
     position: 0,
+    captions: []
   };
 
   onDrop = (e) => {
@@ -46,13 +47,14 @@ class InputFile extends React.Component {
 
     const initAcc = this.props.multiple ? cloneDeep(this.props.value) : {};
     const value = Object.keys(files).reduce((acc, current) => {
-
       if (this.props.multiple) {
+        files[current].caption = this.state.captions[current];
         acc.push(files[current]);
       } else if (current === '0') {
+        files[0].caption = this.state.captions[0];
         acc[0] = files[0];
       }
-
+      
       return acc;
     }, initAcc);
 
@@ -77,6 +79,9 @@ class InputFile extends React.Component {
     // Remove the file from the array if multiple files upload is enable
     if (this.props.multiple) {
       value.splice(this.state.position, 1);
+      this.setState({
+        captions: this.state.captions.slice().splice(this.state.position, 1)
+      });
     }
 
     // Update the parent's props
@@ -116,8 +121,20 @@ class InputFile extends React.Component {
   }
 
   addCaptionToValue = (e) => {
-    console.log(this.props.value[this.state.position]);
-    this.props.value[this.state.position].caption = e.target.value;
+    const captions = this.state.captions.slice();
+    captions[this.state.position] = e.target.value;
+    this.setState({
+      captions
+    });
+    if (this.props.value && this.props.value[this.state.position]) {
+      this.props.value[this.state.position].caption = e.target.value;
+      const target = {
+        name: this.props.name,
+        type: 'file',
+        value: this.props.value,
+      };
+      this.props.onChange({ target });
+    }
   }
 
   render() {
@@ -168,7 +185,7 @@ class InputFile extends React.Component {
           />
         )}
         {/* value={fileVal[this.state.position].caption || ''} */}
-        <InputTextArea placeholder={"Add caption..."} value={null} name="caption" onChange={this.addCaptionToValue.bind(this)} />
+        <InputTextArea placeholder={"Add caption..."} value={this.state.captions[this.state.position] || ''} name="caption" onChange={this.addCaptionToValue} />
       </div>
     );
   }

@@ -137,20 +137,46 @@ export default function request(url, options = {}, shouldWatchServerRestart = fa
   // Stringify body object
   if (options && options.body && stringify) {
     options.body = JSON.stringify(options.body);
-  }
-  console.log(url)
-  if (options.body) {
-    const data = Array.from(options.body.entries()).reduce((memo, pair) => ({
-      ...memo,
-      [pair[0]]: pair[1],
-    }), {});
-    options.body.append("caption", data.media.caption)
-    console.log(Array.from(options.body.entries()).reduce((memo, pair) => ({
-      ...memo,
-      [pair[0]]: pair[1],
-    }), {}));
+  } else if (options && options.body) {
+    // Iterate through fields and check if we have a file field
+    // If we have a file field iterate through the files and add captions
+    // to a caption array. 
+    let fileFields = [];
+    for (const field of options.body.entries()) {
+      if (field[1] instanceof File) {
+        fileFields.push(field[0]);
+      }
+    }
+    // Alright so it looks like we really do need to have a separate field for captions
+    // FormData.append will always convert values to a string unless they are a file.
+    // We could just stringify the object if it didn't also contain a File.
+    fileFields = Array.from(new Set(fileFields));
+    for (const field of fileFields) {
+      const files = [];
+      for (const fileEntry of options.body.getAll(field)) {
+        files.push({
+          caption: fileEntry.caption,
+          file: fileEntry
+        })
+      }
+      // options.body.set(field, JSON.stringify(files));
+    }
+    console.log(options.body);
+    // const data = Array.from(options.body.entries()).reduce((memo, pair) => ({
+    //   ...memo,
+    //   [pair[0]]: pair[1],
+    // }), {});
+    // console.log(data);
+    // options.body.append("caption", data.media.caption)
   }
 
+  // if (options && options.body) {
+  //   const data = Array.from(options.body.entries()).reduce((memo, pair) => ({
+  //     ...memo,
+  //     [pair[0]]: pair[1],
+  //   }), {});
+  //   options.body.append("caption", data.media.caption)
+  // }
 
   return fetch(url, options)
     .then(checkStatus)

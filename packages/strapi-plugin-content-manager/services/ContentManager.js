@@ -55,6 +55,10 @@ module.exports = {
   },
 
   add: async (params, values, source) => {
+    debugger;
+    // UNDEFINED CAPTION HERE
+
+    console.log('SERVICES ContentManager add: ', values);
     // Multipart/form-data.
     if (values.hasOwnProperty('fields') && values.hasOwnProperty('files')) {
       // Silent recursive parser.
@@ -68,9 +72,7 @@ module.exports = {
         return _.isArray(value) ? value.map(obj => parser(obj)) : value;
       };
 
-      let files = values.files;
-
-   
+      const files = values.files;
 
       // Parse stringify JSON data.
       values = Object.keys(values.fields).reduce((acc, current) => {
@@ -81,6 +83,8 @@ module.exports = {
 
       // TODO: This needs to be updated to work with multiple image caption pairs
       Object.keys(files).map((fileKey) => {
+        console.log('FILE KEYYYYY');
+        console.log(fileKey);
         files[fileKey]["caption"] = values.caption
       })
 
