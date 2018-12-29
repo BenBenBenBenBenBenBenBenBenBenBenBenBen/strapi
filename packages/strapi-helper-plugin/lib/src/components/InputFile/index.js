@@ -48,10 +48,10 @@ class InputFile extends React.Component {
     const initAcc = this.props.multiple ? cloneDeep(this.props.value) : {};
     const value = Object.keys(files).reduce((acc, current) => {
       if (this.props.multiple) {
-        files[current].caption = this.state.captions[current];
+        files[current].caption = this.state.captions[current] || '';
         acc.push(files[current]);
       } else if (current === '0') {
-        files[0].caption = this.state.captions[0];
+        files[0].caption = this.state.captions[0] || '';
         acc[0] = files[0];
       }
       
@@ -79,9 +79,17 @@ class InputFile extends React.Component {
     // Remove the file from the array if multiple files upload is enable
     if (this.props.multiple) {
       value.splice(this.state.position, 1);
+      
+      const captions = this.state.captions.slice();
+      captions.splice(this.state.position, 1);
       this.setState({
-        captions: this.state.captions.slice().splice(this.state.position, 1)
+        captions
       });
+    } 
+    else {
+      this.setState({
+        captions: []
+      })
     }
 
     // Update the parent's props
@@ -122,10 +130,12 @@ class InputFile extends React.Component {
 
   addCaptionToValue = (e) => {
     const captions = this.state.captions.slice();
-    captions[this.state.position] = e.target.value;
+    captions[this.state.position] = e.target.value || '';
+    
     this.setState({
       captions
     });
+    
     if (this.props.value && this.props.value[this.state.position]) {
       this.props.value[this.state.position].caption = e.target.value;
       const target = {
@@ -134,6 +144,15 @@ class InputFile extends React.Component {
         value: this.props.value,
       };
       this.props.onChange({ target });
+    }
+  }
+
+  componentWillMount() {
+    if (this.props.value) {
+      const captions = this.props.value.map(file => file.caption);
+      this.setState({
+        captions
+      });
     }
   }
 

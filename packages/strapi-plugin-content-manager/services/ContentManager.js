@@ -55,10 +55,6 @@ module.exports = {
   },
 
   add: async (params, values, source) => {
-    debugger;
-    // UNDEFINED CAPTION HERE
-
-    console.log('SERVICES ContentManager add: ', values);
     // Multipart/form-data.
     if (values.hasOwnProperty('fields') && values.hasOwnProperty('files')) {
       // Silent recursive parser.
@@ -81,21 +77,33 @@ module.exports = {
         return acc;
       }, {});
 
-      // TODO: This needs to be updated to work with multiple image caption pairs
-      Object.keys(files).map((fileKey) => {
-        console.log('FILE KEYYYYY');
-        console.log(fileKey);
-        files[fileKey]["caption"] = values.caption
-      })
+      // Save a copy of the captions lists and remove them from values so they are not
+      // saved to the db.
+      const captions = {};
+      for (const fileField of Object.entries(files)) {
+        let captionsForField = values[`${fileField[0]}Captions`];
+        captionsForField = _.isArray(captionsForField) ? captionsForField.slice() : [captionsForField]; 
+        captions[`${fileField[0]}Captions`] = captionsForField;
+        delete values[`${fileField[0]}Captions`];
+      }
 
       // Update JSON fields.
       const entry = await strapi.query(params.model, source).create({
         values
       });
 
-
       // Then, request plugin upload.
       if (strapi.plugins.upload && Object.keys(files).length > 0) {
+        
+        // Associate the captions with their files
+        for (const fileField of Object.entries(files)) {
+          const captionsForField = captions[`${fileField[0]}Captions`];
+          const fileFieldValues = _.isArray(fileField[1]) ? fileField[1] : [fileField[1]]
+          for (const [idx, file] of fileFieldValues.entries()) {
+            file.caption = captionsForField[idx];
+          }
+        }
+
         // Upload new files and attach them to this entity.
         await strapi.plugins.upload.services.upload.uploadToEntity({
           id: entry.id || entry._id,
@@ -142,14 +150,45 @@ module.exports = {
         return acc;
       }, {});
 
+      console.log('ContentManager edit values: ', values);
+      console.log('ContentManager edit files: ', files);
+
+      // Save a copy of the captions lists and remove them from values so they are not
+      // saved to the db.
+      const captions = {};
+      for (const fileField of Object.entries(files)) {
+        let captionsForField = values[`${fileField[0]}Captions`];
+        captionsForField = _.isArray(captionsForField) ? captionsForField.slice() : [captionsForField]; 
+        captions[`${fileField[0]}Captions`] = captionsForField;
+        delete values[`${fileField[0]}Captions`];
+      }
+
       // Update JSON fields.
       await strapi.query(params.model, source).update({
         id: params.id,
         values
       });
 
+      // This should reflect the new captions!!!!
+      strapi.query(params.model, source).findOne({
+        id: params.id
+      }).then(blah => console.log(blah));
+
       // Then, request plugin upload.
       if (strapi.plugins.upload) {
+        // Update captions for old files
+        // strapi.plugins['upload'].services.upload.edit(params, values);
+
+        // Associate new file captions with new files
+        for (const fileField of Object.entries(files)) {
+          let captionsForField = captions[`${fileField[0]}Captions`];          
+          const fileFieldValues = _.isArray(fileField[1]) ? fileField[1] : [fileField[1]]
+                    
+          for (const [idx, file] of fileFieldValues.entries()) {
+            file.caption = captionsForField[idx];
+          }
+        }
+
         // Upload new files and attach them to this entity.
         await strapi.plugins.upload.services.upload.uploadToEntity(params, files, source);
       }
