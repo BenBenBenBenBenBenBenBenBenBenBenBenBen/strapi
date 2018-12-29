@@ -150,9 +150,6 @@ module.exports = {
         return acc;
       }, {});
 
-      console.log('ContentManager edit values: ', values);
-      console.log('ContentManager edit files: ', files);
-
       // Save a copy of the captions lists and remove them from values so they are not
       // saved to the db.
       const captions = {};
@@ -177,7 +174,15 @@ module.exports = {
       // Then, request plugin upload.
       if (strapi.plugins.upload) {
         // Update captions for old files
-        // strapi.plugins['upload'].services.upload.edit(params, values);
+        const existingFiles = Object.entries(values).reduce((acc, field) => {
+          if (field[1][0] && field[1][0].caption != null) {
+            return acc.concat(field[1]);
+          } else {
+            return acc
+          }
+        }, []);
+        // strapi.plugins['upload'].services.upload.edit(params, existingFiles);
+
 
         // Associate new file captions with new files
         for (const fileField of Object.entries(files)) {
