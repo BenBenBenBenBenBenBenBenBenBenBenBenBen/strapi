@@ -182,6 +182,7 @@ module.exports = {
           }
         }, []);
         // strapi.plugins['upload'].services.upload.edit(params, existingFiles);
+        // strapi.query('file', 'upload').find(_.assign((params, { values: existingFiles}))).then((files) => console.log(files));
 
 
         // Associate new file captions with new files
