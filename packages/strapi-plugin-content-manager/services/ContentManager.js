@@ -125,6 +125,7 @@ module.exports = {
   edit: async (params, values, source) => {
     // Multipart/form-data.
     if (values.hasOwnProperty('fields') && values.hasOwnProperty('files')) {
+
       // Silent recursive parser.
       const parser = (value) => {
         try {
@@ -166,23 +167,24 @@ module.exports = {
         values
       });
 
-      // This should reflect the new captions!!!!
-      strapi.query(params.model, source).findOne({
-        id: params.id
-      }).then(blah => console.log(blah));
-
       // Then, request plugin upload.
       if (strapi.plugins.upload) {
         // Update captions for old files
         const existingFiles = Object.entries(values).reduce((acc, field) => {
           if (field[1][0] && field[1][0].caption != null) {
+            field[1].map((fileObject) => {
+              const updatedObject =  {
+                id: fileObject.id,
+                values: {caption: fileObject.caption}
+              }
+              strapi.query('file', 'upload').update(updatedObject);
+            })
+            
             return acc.concat(field[1]);
           } else {
             return acc
           }
         }, []);
-        // strapi.plugins['upload'].services.upload.edit(params, existingFiles);
-
 
         // Associate new file captions with new files
         for (const fileField of Object.entries(files)) {
@@ -193,7 +195,6 @@ module.exports = {
             file.caption = captionsForField[idx];
           }
         }
-
         // Upload new files and attach them to this entity.
         await strapi.plugins.upload.services.upload.uploadToEntity(params, files, source);
       }

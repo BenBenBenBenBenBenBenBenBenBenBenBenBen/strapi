@@ -156,7 +156,7 @@ export default function request(url, options = {}, shouldWatchServerRestart = fa
     for (const field of fileFields) {
       for (const fileEntry of options.body.getAll(field)) {
         if (fileEntry instanceof File) {
-          console.log(fileEntry);
+          // console.log(fileEntry);
           options.body.append(`${field}Captions`, fileEntry.caption);
         }
       }
