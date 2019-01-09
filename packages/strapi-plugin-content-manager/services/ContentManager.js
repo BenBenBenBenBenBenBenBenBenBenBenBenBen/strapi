@@ -186,6 +186,7 @@ module.exports = {
           }
         }, []);
 
+
         // Associate new file captions with new files
         for (const fileField of Object.entries(files)) {
           let captionsForField = captions[`${fileField[0]}Captions`];          
