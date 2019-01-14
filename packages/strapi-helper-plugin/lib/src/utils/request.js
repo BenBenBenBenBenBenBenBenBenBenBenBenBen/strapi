@@ -1,6 +1,5 @@
 import 'whatwg-fetch';
 import auth from 'utils/auth';
-import { type } from 'os';
 
 /**
  * Parses the JSON returned by a network request

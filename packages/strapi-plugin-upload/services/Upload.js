@@ -34,7 +34,6 @@ module.exports = {
     // transform all files in buffer
     return Promise.all(
       files.map(async stream => {
-        console.log('Upload.js bufferize stream', stream);
         const parts = await toArray(fs.createReadStream(stream.path));
         const buffers = parts.map(
           part => (_.isBuffer(part) ? part : Buffer.from(part)),
@@ -73,9 +72,6 @@ module.exports = {
 
     const actions = provider.init(config);
 
-    // WE AT LEAST HAVE THE CAPTION FIELD ALTHOUGH THERE'S NO DATA IN IT
-    console.log('WE SHOULD HAVE THE CAPTION FIELD WITHOUT DATA');
-    console.log(files);
     // Execute upload function of the provider for all files.
     return Promise.all(
       files.map(async file => {
@@ -92,8 +88,6 @@ module.exports = {
   },
 
   add: async values => {
-    debugger;
-    // UNDEFINED CAPTION HERE
     // Use Content Manager business logic to handle relation.
     if (strapi.plugins['content-manager']) {
       return await strapi.plugins['content-manager'].services[

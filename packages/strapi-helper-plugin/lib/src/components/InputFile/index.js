@@ -24,8 +24,18 @@ class InputFile extends React.Component {
     didDeleteFile: false,
     isUploading: false,
     position: 0,
-    captions: []
+    captions: [],
   };
+
+  componentWillMount() {
+    if (this.props.value) {
+      const value = isArray(this.props.value) ? this.props.value : [this.props.value];
+      const captions = value.map(file => file.caption);
+      this.setState({
+        captions,
+      });
+    }
+  }
 
   onDrop = (e) => {
     e.preventDefault();
@@ -45,7 +55,7 @@ class InputFile extends React.Component {
       return;
     }
 
-    const initAcc = this.props.multiple ? cloneDeep(this.props.value) : {};
+    const initAcc = this.props.multiple || isArray(this.props.value) ? cloneDeep(this.props.value) : {};
     const value = Object.keys(files).reduce((acc, current) => {
       if (this.props.multiple) {
         files[current].caption = this.state.captions[current] || '';
@@ -83,13 +93,13 @@ class InputFile extends React.Component {
       const captions = this.state.captions.slice();
       captions.splice(this.state.position, 1);
       this.setState({
-        captions
+        captions,
       });
     } 
     else {
       this.setState({
-        captions: []
-      })
+        captions: [],
+      });
     }
 
     // Update the parent's props
@@ -133,26 +143,22 @@ class InputFile extends React.Component {
     captions[this.state.position] = e.target.value || '';
     
     this.setState({
-      captions
+      captions,
     });
     
-    if (this.props.value && this.props.value[this.state.position]) {
-      this.props.value[this.state.position].caption = e.target.value;
+    if (this.props.value) {
+      if (isArray(this.props.value) && this.props.value[this.state.position]) {
+        this.props.value[this.state.position].caption = e.target.value;
+      } else {
+        this.props.value.caption = e.target.value;
+      }
+
       const target = {
         name: this.props.name,
         type: 'file',
-        value: this.props.value,
+        value: isArray(this.props.value) ? this.props.value : [this.props.value],
       };
       this.props.onChange({ target });
-    }
-  }
-
-  componentWillMount() {
-    if (this.props.value) {
-      const captions = this.props.value.map(file => file.caption);
-      this.setState({
-        captions
-      });
     }
   }
 
@@ -164,7 +170,6 @@ class InputFile extends React.Component {
       value,
     } = this.props;
 
-    const fileVal = value;
     return (
       <div>
         <div className={cn("form-control", styles.inputFileControlForm, this.props.error && 'is-invalid')}>
@@ -203,8 +208,7 @@ class InputFile extends React.Component {
             onFileDelete={this.handleFileDelete}
           />
         )}
-        {/* value={fileVal[this.state.position].caption || ''} */}
-        <InputTextArea placeholder={"Add caption..."} value={this.state.captions[this.state.position] || ''} name="caption" onChange={this.addCaptionToValue} />
+        <InputTextArea placeholder="Add caption..." value={this.state.captions[this.state.position] || ''} name="caption" onChange={this.addCaptionToValue} />
       </div>
     );
   }

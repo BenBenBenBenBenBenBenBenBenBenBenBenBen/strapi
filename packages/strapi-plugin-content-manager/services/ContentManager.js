@@ -98,7 +98,7 @@ module.exports = {
         // Associate the captions with their files
         for (const fileField of Object.entries(files)) {
           const captionsForField = captions[`${fileField[0]}Captions`];
-          const fileFieldValues = _.isArray(fileField[1]) ? fileField[1] : [fileField[1]]
+          const fileFieldValues = _.isArray(fileField[1]) ? fileField[1] : [fileField[1]];
           for (const [idx, file] of fileFieldValues.entries()) {
             file.caption = captionsForField[idx];
           }
@@ -170,27 +170,23 @@ module.exports = {
       // Then, request plugin upload.
       if (strapi.plugins.upload) {
         // Update captions for old files
-        const existingFiles = Object.entries(values).reduce((acc, field) => {
-          if (field[1][0] && field[1][0].caption != null) {
-            field[1].map((fileObject) => {
+        for (const field of Object.entries(values)) {
+          const valueArray = _.isArray(field[1]) ? field[1] : [field[1]];
+          if (valueArray[0] && valueArray[0].caption != null) {
+            for (const fileObject of valueArray) {
               const updatedObject =  {
                 id: fileObject.id,
                 values: {caption: fileObject.caption}
-              }
+              };
               strapi.query('file', 'upload').update(updatedObject);
-            })
-            
-            return acc.concat(field[1]);
-          } else {
-            return acc
+            }
           }
-        }, []);
-
+        }
 
         // Associate new file captions with new files
         for (const fileField of Object.entries(files)) {
           let captionsForField = captions[`${fileField[0]}Captions`];          
-          const fileFieldValues = _.isArray(fileField[1]) ? fileField[1] : [fileField[1]]
+          const fileFieldValues = _.isArray(fileField[1]) ? fileField[1] : [fileField[1]];
                     
           for (const [idx, file] of fileFieldValues.entries()) {
             file.caption = captionsForField[idx];

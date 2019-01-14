@@ -10,7 +10,6 @@ const _ = require('lodash');
 
 module.exports = {
   upload: async (ctx) => {
-    debugger;
     // Retrieve provider configuration.
     const config = await strapi.store({
       environment: strapi.config.environment,

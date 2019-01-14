@@ -38,7 +38,6 @@ function* dataGet(action) {
     const [response] = yield all([
       call(request, `/content-manager/explorer/${modelName}/${action.id}`, { method: 'GET', params }),
     ]);
-    console.log(response);
     const pluginHeaderTitle = yield call(templateObject, { mainField: action.mainField }, response);
 
     yield put(getDataSucceeded(action.id, response, pluginHeaderTitle.mainField));
